@@ -1,0 +1,13 @@
+{
+  "native": {
+    "minRequiredVersion": "1.0.0",
+    "latestVersion": "1.0.0",
+    "killSwitchActive": false,
+    "message": "Aggiornamento strutturale obbligatorio richiesto per continuare a utilizzare Linfa.",
+    "downloadUrl": "https://Rob1Trinidad.github.io/linfa-releases/linfa-latest.apk"
+  },
+  "ota": {
+    "latestBundleVersion": "1.0.0",
+    "bundleUrl": "https://Rob1Trinidad.github.io/linfa-releases/ota-latest.zip"
+  }
+}
