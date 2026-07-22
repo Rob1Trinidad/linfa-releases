@@ -7,7 +7,7 @@
     "downloadUrl": "https://Rob1Trinidad.github.io/linfa-releases/linfa-latest.apk"
   },
   "ota": {
-    "latestBundleVersion": "4.00.00",
+    "latestBundleVersion": "4.00.01",
     "bundleUrl": "https://Rob1Trinidad.github.io/linfa-releases/ota-latest.zip"
   }
 }
