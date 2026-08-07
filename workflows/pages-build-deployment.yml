@@ -1,0 +1,105 @@
+name: Pages build & deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: pages-deploy-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cancel in-progress Pages deployments (if any)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          OWNER="${REPOSITORY%%/*}"
+          REPO="${REPOSITORY##*/}"
+          echo "Repo: $OWNER/$REPO"
+          resp=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${OWNER}/${REPO}/deployments?environment=github-pages")
+          ids=$(echo "$resp" | jq -r '.[].id // empty')
+          if [ -z "$ids" ]; then
+            echo "No github-pages deployments found."
+          else
+            for id in $ids; do
+              latest_state=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${OWNER}/${REPO}/deployments/${id}/statuses" \
+                | jq -r '.[0].state // "none"')
+              echo "Deployment $id latest state: $latest_state"
+              if [ "$latest_state" = "in_progress" ]; then
+                echo "Marking deployment $id as inactive to allow new Pages deployment..."
+                curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" \
+                  -d '{"state":"inactive","description":"Cancelled by workflow to allow new Pages deployment"}' \
+                  "https://api.github.com/repos/${OWNER}/${REPO}/deployments/${id}/statuses" >/dev/null
+                echo "Marked deployment $id inactive."
+              fi
+            done
+          fi
+
+      - name: Wait for any in-progress Pages deployment to finish (polling)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          MAX_ATTEMPTS: 30
+          SLEEP_SECONDS: 10
+        run: |
+          set -euo pipefail
+          OWNER="${REPOSITORY%%/*}"
+          REPO="${REPOSITORY##*/}"
+          attempt=0
+          while [ $attempt -lt "$MAX_ATTEMPTS" ]; do
+            inprog=0
+            resp=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${OWNER}/${REPO}/deployments?environment=github-pages")
+            ids=$(echo "$resp" | jq -r '.[].id // empty')
+            for id in $ids; do
+              state=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${OWNER}/${REPO}/deployments/${id}/statuses" \
+                | jq -r '.[0].state // "none"')
+              if [ "$state" = "in_progress" ]; then
+                echo "Found in-progress deployment $id"
+                inprog=1
+                break
+              fi
+            done
+            if [ "$inprog" -eq 0 ]; then
+              echo "No in-progress Pages deployments found — continuing."
+              exit 0
+            fi
+            attempt=$((attempt+1))
+            echo "Attempt $attempt/$MAX_ATTEMPTS: in-progress detected, sleeping ${SLEEP_SECONDS}s..."
+            sleep "${SLEEP_SECONDS}"
+          done
+          echo "Timed out waiting for in-progress Pages deployment to finish." >&2
+          exit 1
+
+      - name: Build (optional)
+        run: |
+          # Se hai un processo di build (es. npm run build), abilitalo qui.
+          # Esempio: se esiste package.json esegui build JS/static
+          if [ -f package.json ]; then
+            npm ci
+            if npm run | grep -q 'build'; then
+              npm run build
+            fi
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Sostituisci ./public con la cartella contenente i file statici
+          path: ./public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5
