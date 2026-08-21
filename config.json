@@ -1,7 +1,7 @@
 {
   "native": {
-    "minRequiredVersion": "1.0.0",
-    "latestVersion": "1.0.0",
+    "minRequiredVersion": "2.0.0",
+    "latestVersion": "2.0.0",
     "killSwitchActive": false,
     "message": "Aggiornamento strutturale obbligatorio richiesto per continuare a utilizzare Linfa.",
     "downloadUrl": "https://rob1trinidad.github.io/linfa-releases/linfa-latest.apk"
