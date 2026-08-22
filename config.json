@@ -3,7 +3,7 @@
     "minRequiredVersion": "2.0.0",
     "latestVersion": "2.0.0",
     "killSwitchActive": false,
-    "message": "Aggiornamento strutturale obbligatorio richiesto per continuare a utilizzare Linfa.",
+    "message": "È richiesto un aggiornamento strutturale obbligatorio per continuare a utilizzare Linfa. In caso di errore durante l'installazione del pacchetto, disinstalla la versione precedente e reinstalla il nuovo file: tutti i tuoi dati e il tuo portafoglio rimangono al sicuro e immediatamente ripristinabili tramite Google Drive o file di backup locale.",
     "downloadUrl": "https://rob1trinidad.github.io/linfa-releases/linfa-latest.apk"
   },
   "ota": {
