@@ -1,13 +1,13 @@
 {
   "native": {
     "minRequiredVersion": "2.0.0",
-    "latestVersion": "2.3.013",
+    "latestVersion": "2.3.014",
     "killSwitchActive": false,
     "message": "È richiesto un aggiornamento strutturale obbligatorio per continuare a utilizzare Linfa. In caso di errore durante l'installazione del pacchetto, disinstalla la versione precedente e reinstalla il nuovo file: tutti i tuoi dati e il tuo portafoglio rimangono al sicuro e immediatamente ripristinabili tramite Google Drive o file di backup locale.",
     "downloadUrl": "https://github.com/Rob1Trinidad/linfa-releases/releases/latest/download/Linfa.apk"
   },
   "ota": {
-    "latestBundleVersion": "2.3.013",
+    "latestBundleVersion": "2.3.014",
     "bundleUrl": "https://rob1trinidad.github.io/linfa-releases/ota-latest.zip"
   }
 }
